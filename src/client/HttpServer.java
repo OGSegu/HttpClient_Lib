@@ -8,4 +8,8 @@ public interface HttpServer extends Closeable {
 
     void bind(SocketAddress socketAddress) throws IOException;
 
+    HttpHandler handler();
+
+    void accept();
+
 }
