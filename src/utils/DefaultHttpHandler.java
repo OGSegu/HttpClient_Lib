@@ -1,6 +1,6 @@
 package utils;
 
-import client.HttpHandler;
+import server.HttpHandler;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,7 +14,7 @@ public class DefaultHttpHandler extends HttpHandler  {
     @Override
     public void completed(AsynchronousSocketChannel socketChannel, AsynchronousServerSocketChannel serverSocketChannel) {
         try {
-            System.out.println("Received connection from: " + socketChannel.getRemoteAddress().toString());
+            System.out.println("Received connection");
             serverSocketChannel.accept(serverSocketChannel, this);
             StringBuilder sb = new StringBuilder();
             ByteBuffer byteBuffer = ByteBuffer.allocate(BYTE_LIMIT);
@@ -33,10 +33,11 @@ public class DefaultHttpHandler extends HttpHandler  {
             }
             System.out.println(sb);
             socketChannel.write(ByteBuffer.wrap("Your input was received. Thank you\r\n".getBytes()));
-        } catch (InterruptedException | ExecutionException | IOException e) {
+        } catch (ExecutionException e) {
             e.printStackTrace();
-        }
-        finally {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
             try {
                 socketChannel.close();
             } catch (IOException e) {
@@ -47,6 +48,6 @@ public class DefaultHttpHandler extends HttpHandler  {
 
     @Override
     public void failed(Throwable exc, AsynchronousServerSocketChannel attachment) {
-
+        exc.printStackTrace();
     }
 }
