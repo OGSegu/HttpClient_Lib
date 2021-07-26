@@ -1,6 +1,9 @@
 package utils;
 
+import dto.HttpRequestDTO;
+import exception.HttpSyntaxException;
 import server.HttpHandler;
+import service.HttpRequestMapper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,14 +24,27 @@ public class DefaultHttpHandler extends HttpHandler  {
             logger.log(Level.INFO, "Received connection from: {0}", socketChannel.getRemoteAddress());
             serverSocketChannel.accept(serverSocketChannel, this);
             StringBuilder sb = readRequest(socketChannel);
-            logger.log(Level.INFO, "Received data:\n{0}", sb);
-            socketChannel.write(ByteBuffer.wrap("Your input was received. Thank you\n".getBytes()));
+            logger.log(Level.INFO, "Received data:\r\n{0}", sb);
+            HttpRequestDTO httpRequestDTO = HttpRequestMapper.parse(sb.toString());
+
+            switch (httpRequestDTO.getEndpoint()) {
+                case ("/"):
+                    socketChannel.write(ByteBuffer.wrap("In root".getBytes()));
+                    break;
+                case ("/user"):
+                    socketChannel.write(ByteBuffer.wrap("In user".getBytes()));
+                    break;
+                default:
+                    socketChannel.write(ByteBuffer.wrap("ERROR! FAILED TO GET THIS ENDPOINT".getBytes()));
+            }
         } catch (ExecutionException e) {
-            logger.log(Level.WARNING,"Failed to read request:\n{0}", e.getCause().getMessage());
+            logger.log(Level.WARNING,"Failed to read request:\r\n{0}", e.getCause().getMessage());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (IOException e) {
-            logger.warning("Failed to get remote socket address");
+            logger.log(Level.WARNING, "Failed to get remote socket address");
+        } catch (HttpSyntaxException e) {
+            logger.log(Level.WARNING, e.getMessage());
         } finally {
             try {
                 socketChannel.close();
@@ -36,25 +52,6 @@ public class DefaultHttpHandler extends HttpHandler  {
                 logger.warning("Failed to close connection");
             }
         }
-    }
-
-    private StringBuilder readRequest(AsynchronousSocketChannel socketChannel) throws InterruptedException, ExecutionException {
-        ByteBuffer byteBuffer = ByteBuffer.allocate(BYTE_LIMIT);
-        StringBuilder sb = new StringBuilder();
-        boolean keepReading = true;
-        while (keepReading) {
-            socketChannel.read(byteBuffer).get();
-
-            keepReading = byteBuffer.position() == BYTE_LIMIT;
-
-            byte[] arrayHttpResponse = keepReading
-                    ? byteBuffer.array()
-                    : Arrays.copyOfRange(byteBuffer.array(), 0, byteBuffer.position());
-
-            sb.append(new String(arrayHttpResponse));
-            byteBuffer.clear();
-        }
-        return sb;
     }
 
     @Override
