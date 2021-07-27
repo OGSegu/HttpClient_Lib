@@ -1,15 +1,18 @@
-package component;
+package server.component;
 
 import annonations.Endpoint;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
-class EndpointInitializer {
+public class EndpointInitializer {
 
-    private final ComponentScanner scanner = new ComponentScanner();
+    private static final ComponentScanner scanner = new ComponentScanner();
 
-    void initBeans() throws InvocationTargetException,
+    private EndpointInitializer() {
+    }
+
+    static void initBeans() throws InvocationTargetException,
             NoSuchMethodException, InstantiationException, IllegalAccessException {
 
         Map<String, Class<?>> stringClassMap = scanner.scanForEndpoint(Endpoint.class);

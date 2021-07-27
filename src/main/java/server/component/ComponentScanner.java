@@ -1,4 +1,4 @@
-package component;
+package server.component;
 
 import annonations.Endpoint;
 import exception.MultipleHttpAnnotationsException;
@@ -8,22 +8,15 @@ import utils.HttpMethod;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.logging.Level;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 class ComponentScanner {
 
     private static final Logger logger = Logger.getAnonymousLogger();
-
-    /*
-        1. On init scan all classes with endpoint annotation and also store its methods annotated with get,post and etc.
-        Format: Map<T, A>
-        T - endpoint (probably string)
-        A - class instance, methods (get, post, etc only)
-
-        httpRequest -> value = map.get(httpRequest.getEndpoint()) -> method = value.getMethod(HttpMethod.GET) -> method.invoke(value.getInstance(), params[])
-   */
 
     Map<String, Class<?>> scanForEndpoint(Class<Endpoint> annotation) {
         Map<String, Class<?>> resultMap = new HashMap<>();
@@ -51,7 +44,7 @@ class ComponentScanner {
             Method[] declaredMethods = entry.getValue().getDeclaredMethods();
 
             for (Method declaredMethod : declaredMethods) {
-                try {
+
                     if (declaredMethod.getAnnotations().length == 0) {
                         continue;
                     }
@@ -61,9 +54,7 @@ class ComponentScanner {
                     if (httpAnnotation != null) {
                         methodMap.put(httpAnnotation, declaredMethod);
                     }
-                } catch (MultipleHttpAnnotationsException e) {
-                    logger.log(Level.WARNING, e.getMessage());
-                }
+
             }
             resultMap.put(entry.getKey(), new BeanHolder.EndpointClassHolder(endpointClassObject, methodMap));
         }
@@ -85,7 +76,7 @@ class ComponentScanner {
         }
 
         if (httpMethodAnnotationCounter > 1) {
-            throw new MultipleHttpAnnotationsException("More than one HttpMethod annotation on method: " + method);
+            throw new MultipleHttpAnnotationsException("More than one http annotation on method: " + method);
         }
     }
 

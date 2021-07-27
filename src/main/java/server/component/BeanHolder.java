@@ -1,4 +1,4 @@
-package component;
+package server.component;
 
 import utils.HttpMethod;
 

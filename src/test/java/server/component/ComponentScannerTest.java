@@ -1,7 +1,8 @@
-package component;
+package server.component;
 
 import annonations.Endpoint;
 import org.junit.jupiter.api.Test;
+import server.ComponentScanner;
 import utils.HttpMethod;
 
 import java.lang.reflect.InvocationTargetException;
