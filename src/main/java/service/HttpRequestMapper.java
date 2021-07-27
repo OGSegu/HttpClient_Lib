@@ -33,7 +33,7 @@ public class HttpRequestMapper {
 
     private static HttpMethod getHttpMethod(String httpMethod) throws HttpSyntaxException {
         if (HttpMethod.contains(httpMethod)) {
-            return HttpMethod.valueOf(httpMethod);
+            return HttpMethod.getValue(httpMethod);
         } else {
             throw new HttpSyntaxException("Http method is not valid: " + httpMethod);
         }
