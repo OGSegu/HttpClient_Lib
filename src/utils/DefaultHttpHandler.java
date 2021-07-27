@@ -26,12 +26,24 @@ public class DefaultHttpHandler extends HttpHandler  {
             logger.log(Level.INFO, "Received data:\r\n{0}", sb);
             HttpRequestDTO httpRequestDTO = HttpRequestMapper.parse(sb.toString());
 
+            /*
+            Init all endpoints and store it in Map
+
+            Map<T, A>
+            T - endpoint, probably string
+            A - class by reflection
+
+            Get endpoint class for httpRequestDTO.getEndpoint() and find method get, post and etc.
+
+             */
+
             switch (httpRequestDTO.getEndpoint()) {
                 case ("/"):
                     socketChannel.write(ByteBuffer.wrap("In root".getBytes()));
                     break;
                 case ("/user"):
                     socketChannel.write(ByteBuffer.wrap("In user".getBytes()));
+                    socketChannel.write(ByteBuffer.wrap(httpRequestDTO.getParams().toString().getBytes()));
                     break;
                 default:
                     socketChannel.write(ByteBuffer.wrap("ERROR! FAILED TO GET THIS ENDPOINT".getBytes()));

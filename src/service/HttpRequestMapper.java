@@ -4,6 +4,7 @@ import dto.HttpRequestDTO;
 import exception.HttpSyntaxException;
 import utils.HttpMethod;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class HttpRequestMapper {
         String endpointWithoutParams = endpointSplit[0];
 
         if (endpointSplit.length == 1) {
-            return new HttpRequestDTO(httpRequestMethod, endpointWithoutParams, null);
+            return new HttpRequestDTO(httpRequestMethod, endpointWithoutParams, Collections.emptyMap());
         } else {
             String rawParams = endpointSplit[1];
             Map<String, String> paramsMap = parseParams(rawParams);
